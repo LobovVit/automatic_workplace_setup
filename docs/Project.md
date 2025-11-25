@@ -277,7 +277,7 @@ JavaScript:
 
 Файл спецификации:
 
-- `api/openapi.yaml`
+- [openapi](api/openapi.yml)
 
 Краткое содержание:
 
