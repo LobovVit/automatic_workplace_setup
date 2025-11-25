@@ -1,0 +1,18 @@
+@startuml c4-level2-containers
+!include ./include/C4_Container.puml
+title C4: Container Diagram – Автонастройка АРМ
+Person(user, "Пользователь")
+System_Boundary(sys, "Система автонастройки АРМ") {
+  Container(web, "Веб-страница входа", "HTML/JS", "Страница входа, ссылки на мастера, статус подсистем, новости")
+  Container(backend, "Backend/API", "REST / Nginx", "Отдаёт status.json, news.json, файлы мастеров и инструкцию")
+  Container(master_win, "Мастер Windows", "Desktop App", "Автоматическая настройка окружения Windows")
+  Container(master_linux, "Мастер Linux", "Desktop App", "Автоматическая настройка окружения Linux")
+}
+System_Ext(eb, "ГИИС Электронный Бюджет", "Портал")
+Rel(user, web, "Открывает через браузер")
+Rel(web, backend, "Запросы за статусом и новостями")
+Rel(user, master_win, "Скачивает и запускает (Windows)", "EXE")
+Rel(user, master_linux, "Скачивает и запускает (Linux)", "AppImage/скрипт")
+Rel(master_win, eb, "Проверка доступности портала / открытие ЛК", "HTTPS")
+Rel(master_linux, eb, "Проверка доступности портала / открытие ЛК", "HTTPS")
+@enduml

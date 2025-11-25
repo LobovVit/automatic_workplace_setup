@@ -1,0 +1,101 @@
+@startuml c4-level4-master-code
+title Level 4 – Code Structure of Master and Controls
+left to right direction
+
+package "MasterApp" {
+
+  class MasterApp {
+    - mainWindow : MainWindow
+    + run()
+    + showMainWindow()
+  }
+
+  class MainWindow {
+    - workflow : WorkflowEngine
+    + startDiagnostics()
+    + showResults()
+    + exportReport()
+  }
+
+  class WorkflowEngine {
+    - controls : "list of IControl"
+    - logger   : LoggerService
+    + runAll()
+    + runControl(control : IControl)
+  }
+
+  interface IControl {
+    + getName() : String
+    + check() : CheckResult
+    + fix(result : CheckResult) : FixResult
+  }
+
+  class CheckResult {
+    + name    : String
+    + status  : Status
+    + details : String
+  }
+
+  class FixResult {
+    + name    : String
+    + status  : Status
+    + details : String
+  }
+
+  enum Status {
+    OK
+    WARNING
+    ERROR
+  }
+
+  class LoggerService {
+    + logInfo(msg : String)
+    + logWarning(msg : String)
+    + logError(msg : String)
+    + saveReport(path : String)
+  }
+
+  class ReportGenerator {
+    + buildReport(results, fixes) : String
+  }
+}
+
+package "Controls" {
+
+  class BrowserGostControl
+  class CryptoProCspControl
+  class CryptoProPluginControl
+  class CertificatesRootIntermediateControl
+  class RutokenDriverControl
+  class PersonalCertificateControl
+  class CompetingClientsControl
+  class PortalAvailabilityControl
+}
+
+' Связи внутри MasterApp
+MasterApp --> MainWindow
+MainWindow --> WorkflowEngine
+
+WorkflowEngine --> IControl          : вызывает
+WorkflowEngine --> LoggerService     : логирует
+WorkflowEngine --> CheckResult       : создаёт
+WorkflowEngine --> FixResult         : создаёт
+
+LoggerService --> ReportGenerator    : формирует отчёт
+ReportGenerator --> CheckResult      : использует
+ReportGenerator --> FixResult        : использует
+
+CheckResult --> Status
+FixResult  --> Status
+
+' Наследование контролей
+IControl <|.. BrowserGostControl
+IControl <|.. CryptoProCspControl
+IControl <|.. CryptoProPluginControl
+IControl <|.. CertificatesRootIntermediateControl
+IControl <|.. RutokenDriverControl
+IControl <|.. PersonalCertificateControl
+IControl <|.. CompetingClientsControl
+IControl <|.. PortalAvailabilityControl
+
+@enduml

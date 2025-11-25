@@ -1,0 +1,21 @@
+@startuml c4-level3-master-components
+!include ./include/C4_Component.puml
+title C4: Components of Master (Windows/Linux)
+
+Container(master, "Мастер автонастройки", "Desktop App") {
+
+  Component(ui, "UI Layer", "WPF/GTK/Qt", "Окна, экраны, отчёты, визуализация статуса")
+
+  Component(workflow, "Workflow Engine", "Core Logic", "Оркестрация выполнения контролей Check/Fix")
+
+  Component(controls, "Controls (Plugins)", "Набор модулей диагностики", "Browser, CryptoPro, Plugins, Certificates, Rutoken, etc.")
+
+  Component(logging, "Logging/Reports", "Local FS", "Логирование шагов и генерация отчёта")
+}
+
+Rel(ui, workflow, "Управляет сценарием настройки")
+Rel(workflow, controls, "Вызывает Check()/Fix() на каждом контроле")
+Rel(workflow, logging, "Сохраняет результаты проверок и исправлений")
+Rel(ui, logging, "Запрашивает отчёт для отображения/экспорта")
+
+@enduml
