@@ -1,28 +1,88 @@
-@startuml
-title C4 Level 4 – Code-Level Diagram (WorkflowEngine + Controls)
+@startuml c4-level4-master-code
+title C4 Level 4 — Code-Level Diagram (WorkflowEngine + Controls)
+
+' Основные сущности движка
 
 class WorkflowEngine {
-    + RunAllControls()
-    - controls : List<IControl>
+    - controls : IList<IControl>
+    + WorkflowEngine(controls : IList<IControl>)
+    + RunAll() : WorkflowResult
+    + RunSingle(controlName : string) : ControlExecutionResult
 }
 
 interface IControl {
+    + Name : string
     + Check() : CheckResult
-    + Fix(result: CheckResult) : FixResult
+    + Fix(checkResult : CheckResult) : FixResult
 }
 
 class CheckResult {
     + IsOk : bool
+    + Code : string
     + Message : string
+    + Details : object
 }
 
 class FixResult {
     + Success : bool
+    + Code : string
     + Message : string
+    + Details : object
 }
 
-WorkflowEngine --> IControl : вызывает
+class WorkflowResult {
+    + Checks : IList<CheckResult>
+    + Fixes : IList<FixResult>
+    + IsAllOk() : bool
+}
+
+' Базовый класс для контролей (опционально, но удобно для логики)
+
+abstract class ControlBase {
+    + Name : string
+    + Check() : CheckResult
+    + Fix(checkResult : CheckResult) : FixResult
+    # Log(message : string) : void
+}
+
+ControlBase ..|> IControl
+
+' Примеры конкретных контролей
+
+class CryptoProCspControl {
+    + Name : string
+    + Check() : CheckResult
+    + Fix(checkResult : CheckResult) : FixResult
+}
+
+class CertificatesRootIntermediateControl {
+    + Name : string
+    + Check() : CheckResult
+    + Fix(checkResult : CheckResult) : FixResult
+}
+
+class RutokenDriverControl {
+    + Name : string
+    + Check() : CheckResult
+    + Fix(checkResult : CheckResult) : FixResult
+}
+
+class PortalAvailabilityControl {
+    + Name : string
+    + Check() : CheckResult
+    + Fix(checkResult : CheckResult) : FixResult
+}
+
+CryptoProCspControl --|> ControlBase
+CertificatesRootIntermediateControl --|> ControlBase
+RutokenDriverControl --|> ControlBase
+PortalAvailabilityControl --|> ControlBase
+
+' Связи
+
+WorkflowEngine --> IControl : использует
 IControl --> CheckResult
 IControl --> FixResult
+WorkflowEngine --> WorkflowResult
 
-@endum
+@enduml

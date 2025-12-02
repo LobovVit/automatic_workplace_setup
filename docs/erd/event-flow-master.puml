@@ -1,19 +1,27 @@
-@startuml
-title Event Flow — Работа пользователя с подсистемой
+@startuml event-flow-master
+title Event Flow — Пользователь, портал Grav и мастер автонастройки
 
-actor Пользователь
-participant "Портал (Grav Slave)" as Portal
-participant "Мастер автонастройки" as Master
-participant "ЛК ГИИС ЭБ" as LK
+actor User as "Пользователь"
+participant "Веб-портал (Grav Slave через LB/Nginx)" as Portal
+participant "Мастер автонастройки\n(Desktop, Avalonia .NET)" as Master
+participant "ЛК ГИИС «Электронный бюджет»" as LK
 
-Пользователь -> Portal : Открывает портал
-Portal -> Пользователь : Показывает страницы / аварии / новости
+' 1. Пользователь открывает портал
+User -> Portal : Открывает страницу помощи/входа\n(HTTP/HTTPS через LB → Nginx → Grav Slave)
+Portal --> User : HTML/страница с новостями,\nавариями и ссылками на мастера
 
-Пользователь -> Portal : Скачивает мастер
-Пользователь -> Master : Запускает мастер локально
-Master -> Master : Проверка → Fix → Отчёт
-Master -> Пользователь : Показать отчёт
+' 2. Скачивание мастера
+User -> Portal : Запрос на скачивание мастера (Win/Linux)
+Portal --> User : Файл мастера (.exe / .AppImage)
 
-Пользователь -> LK : Открывает ЛК ГИИС ЭБ
+' 3. Запуск мастера
+User -> Master : Запускает мастер локально\n(без сети)
+Master -> Master : Проверка конфигурации АРМ (Check)\nCryptoPro, сертификаты, Рутокен, конкурирующие клиенты
+Master -> Master : Автоматическое исправление (Fix)\nгде возможно
+Master --> User : Показ итогового отчёта\n(список найденных и исправленных проблем)
+
+' 4. Переход в ЛК ЭБ
+User -> LK : Открывает ЛК ГИИС «ЭБ» в браузере\n(HTTP/HTTPS, вне мастера)
+LK --> User : Личный кабинет
 
 @enduml
