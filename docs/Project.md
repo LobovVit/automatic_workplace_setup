@@ -346,11 +346,11 @@ Nginx выполняет:
 
 1. **Level 1 — System Context**
     - Расположение: `docs/c4/c4-level1-system-context.puml`
-    - Изображение: `docs/images/c4-level1-system-context.png`
+    - ![Изображение:](./images/c4-level1-system-context.png)
 
 2. **Level 2 — Containers (обновлённый вариант с двумя Grav Slave)**
     - Расположение: `docs/c4/c4-level2-containers.puml`
-    - Изображение: `docs/images/c4-level2-containers.png`
+    - ![Изображение:](./images/c4-level2-containers.png)
     - Особенность: топология серверной части отражает два независимых Grav Slave:
       ```
       LB → Nginx1 → GravSlave1
@@ -359,15 +359,15 @@ Nginx выполняет:
 
 3. **Level 3 — Components (Master)**
     - Расположение: `docs/c4/c4-level3-master-components.puml`
-    - Изображение: `docs/images/c4-level3-master-components.png`
+    - ![Изображение:](./images/c4-level3-master-components.png)
 
 4. **Level 4 — Code Level (WorkflowEngine + Controls)**
     - Расположение: `docs/c4/c4-level4-master-code.puml`
-    - Изображение: `docs/images/c4-level4-master-code.png`
+    - ![Изображение:](./images/c4-level4-master-code.png)
 
 5. **Event Flow — последовательность взаимодействий**
     - Расположение: `docs/event-flow/event-flow-master.puml`
-    - Изображение: `docs/images/event-flow-master.png`
+    - ![Изображение:](./images/event-flow-master.png)
 
 # 8. Event Flow (последовательность событий)
 
@@ -390,11 +390,11 @@ Nginx выполняет:
 
 В проекте ведётся набор ADR, фиксирующих ключевые решения:
 
-- **ADR-001** — форм-фактор мастера (desktop-приложение).
-- **ADR-002** — архитектура WorkflowEngine + Controls.
-- **ADR-003** — структура отчёта мастера.
-- **ADR-004** — отказ от backend и переход к полностью статической архитектуре Grav.
-- **ADR-005** — использование CMS Grav в конфигурации Master/Slave без отдельного backend.
+- [**ADR-001** — форм-фактор мастера (desktop-приложение).](./adr/adr-001-delivery-and-form-factor.md)
+- [**ADR-002** — архитектура WorkflowEngine + Controls.](./adr/adr-002-plugin-based-controls-and-workflow.md)
+- [**ADR-003** — структура отчёта мастера.](./adr/adr-003-local-execution-and-logging.md)
+- [**ADR-004** — отказ от backend и переход к полностью статической архитектуре Grav.](./adr/adr-004-backend-optional-vs-static-only.md)
+- [**ADR-005** — использование CMS Grav в конфигурации Master/Slave без отдельного backend.](./adr/adr-005-Grav-Master-Slave-Nginx-LB.md)
 
 ---
 
