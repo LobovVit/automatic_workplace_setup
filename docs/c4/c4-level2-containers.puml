@@ -1,28 +1,46 @@
 @startuml c4-level2-containers
 !include ./include/C4_Container.puml
-title C4: Container Diagram – Автонастройка АРМ
+title C4: Container Diagram — Автонастройка АРМ (2 Grav Slave)
 
 Person(user, "Пользователь")
+Person(admin, "Администратор ФК")
 
-System_Boundary(sys, "Система автонастройки АРМ") {
-  Container(web, "Веб-страница входа", "HTML/JS", "Страница входа, ссылки на мастера, статус подсистем, новости")
-  Container(grav, "CMS Grav", "PHP", "Управление контентом, файлами дистрибутивов, сертификатами")
-  Container(backend, "Backend/API", "REST / Nginx", "Отдаёт status.json, news.json, файлы мастеров и инструкцию")
-  Container(master_win, "Мастер Windows", "Desktop App", "Автоматическая настройка окружения Windows")
-  Container(master_linux, "Мастер Linux", "Desktop App", "Автоматическая настройка окружения Linux")
+System_Boundary(sys, "Подсистема автонастройки АРМ") {
+
+  ContainerQueue(lb, "Load Balancer", "L4/L7", "Балансирует HTTP(S) на Nginx")
+
+  Container(nginx1, "Nginx #1", "Reverse Proxy", "Принимает трафик, раздаёт статику, проксирует к GravSlave1")
+  Container(nginx2, "Nginx #2", "Reverse Proxy", "Принимает трафик, раздаёт статику, проксирует к GravSlave2")
+
+  ContainerDb(grav_master, "Grav Master", "PHP CMS", "Управление контентом, админка (доступна только в локальной сети ФК)")
+  ContainerDb(grav_slave1, "Grav Slave #1", "PHP CMS", "Отдаёт страницы пользователям (read-only)")
+  ContainerDb(grav_slave2, "Grav Slave #2", "PHP CMS", "Отдаёт страницы пользователям (read-only)")
+
+  Container(master_win, "Мастер Windows", "Desktop App (.NET + Avalonia)", "Автонастройка АРМ Windows")
+  Container(master_linux, "Мастер Linux", "Desktop App (.NET + Avalonia)", "Автонастройка АРМ Linux")
 }
 
-System_Ext(eb, "ГИИС Электронный Бюджет", "Портал")
+' Пользователь открывает портал
+Rel(user, lb, "Открывает портал / скачивает мастер", "HTTPS")
 
-Rel(user, web, "Открывает через браузер")
-Rel(web, backend, "Запросы за статусом и новостями")
-Rel(user, master_win, "Скачивает и запускает (Windows)", "EXE")
-Rel(user, master_linux, "Скачивает и запускает (Linux)", "AppImage/скрипт")
-Rel(master_win, eb, "Проверка доступности портала / открытие ЛК", "HTTPS")
-Rel(master_linux, eb, "Проверка доступности портала / открытие ЛК", "HTTPS")
+Rel(lb, nginx1, "HTTP/HTTPS")
+Rel(lb, nginx2, "HTTP/HTTPS")
 
-Person(admin, "Администратор ФК")
-Rel(web, grav, "Получает контент и файлы", "HTTP")
-Rel(admin, grav, "Администрирование CMS", "HTTPS (локальная сеть)")
+Rel(nginx1, grav_slave1, "Proxy на Grav Slave #1", "FastCGI/PHP-FPM")
+Rel(nginx2, grav_slave2, "Proxy на Grav Slave #2", "FastCGI/PHP-FPM")
+
+Rel(grav_slave1, user, "Отдаёт HTML/JS/файлы мастеров", "HTTPS")
+Rel(grav_slave2, user, "Отдаёт HTML/JS/файлы мастеров", "HTTPS")
+
+' Репликация Master → оба Slave
+Rel(grav_master, grav_slave1, "Синхронизация контента", "rsync/Git/CI-CD")
+Rel(grav_master, grav_slave2, "Синхронизация контента", "rsync/Git/CI-CD")
+
+' Администратор
+Rel(admin, grav_master, "Управляет контентом", "HTTPS (локальная сеть)")
+
+' Пользователь запускает мастер локально
+Rel(user, master_win, "Запускает мастера", "локально")
+Rel(user, master_linux, "Запускает мастера", "локально")
 
 @enduml

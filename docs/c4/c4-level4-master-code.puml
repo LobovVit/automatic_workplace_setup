@@ -1,101 +1,28 @@
-@startuml c4-level4-master-code
-title Level 4 – Code Structure of Master and Controls
-left to right direction
+@startuml
+title C4 Level 4 – Code-Level Diagram (WorkflowEngine + Controls)
 
-package "MasterApp" {
-
-  class MasterApp {
-    - mainWindow : MainWindow
-    + run()
-    + showMainWindow()
-  }
-
-  class MainWindow {
-    - workflow : WorkflowEngine
-    + startDiagnostics()
-    + showResults()
-    + exportReport()
-  }
-
-  class WorkflowEngine {
-    - controls : "list of IControl"
-    - logger   : LoggerService
-    + runAll()
-    + runControl(control : IControl)
-  }
-
-  interface IControl {
-    + getName() : String
-    + check() : CheckResult
-    + fix(result : CheckResult) : FixResult
-  }
-
-  class CheckResult {
-    + name    : String
-    + status  : Status
-    + details : String
-  }
-
-  class FixResult {
-    + name    : String
-    + status  : Status
-    + details : String
-  }
-
-  enum Status {
-    OK
-    WARNING
-    ERROR
-  }
-
-  class LoggerService {
-    + logInfo(msg : String)
-    + logWarning(msg : String)
-    + logError(msg : String)
-    + saveReport(path : String)
-  }
-
-  class ReportGenerator {
-    + buildReport(results, fixes) : String
-  }
+class WorkflowEngine {
+    + RunAllControls()
+    - controls : List<IControl>
 }
 
-package "Controls" {
-
-  class BrowserGostControl
-  class CryptoProCspControl
-  class CryptoProPluginControl
-  class CertificatesRootIntermediateControl
-  class RutokenDriverControl
-  class PersonalCertificateControl
-  class CompetingClientsControl
-  class PortalAvailabilityControl
+interface IControl {
+    + Check() : CheckResult
+    + Fix(result: CheckResult) : FixResult
 }
 
-' Связи внутри MasterApp
-MasterApp --> MainWindow
-MainWindow --> WorkflowEngine
+class CheckResult {
+    + IsOk : bool
+    + Message : string
+}
 
-WorkflowEngine --> IControl          : вызывает
-WorkflowEngine --> LoggerService     : логирует
-WorkflowEngine --> CheckResult       : создаёт
-WorkflowEngine --> FixResult         : создаёт
+class FixResult {
+    + Success : bool
+    + Message : string
+}
 
-LoggerService --> ReportGenerator    : формирует отчёт
-ReportGenerator --> CheckResult      : использует
-ReportGenerator --> FixResult        : использует
+WorkflowEngine --> IControl : вызывает
+IControl --> CheckResult
+IControl --> FixResult
 
-CheckResult --> Status
-FixResult  --> Status
-
-' Наследование контролей
-IControl <|.. BrowserGostControl
-IControl <|.. CryptoProCspControl
-IControl <|.. CryptoProPluginControl
-IControl <|.. CertificatesRootIntermediateControl
-IControl <|.. RutokenDriverControl
-IControl <|.. PersonalCertificateControl
-IControl <|.. CompetingClientsControl
-IControl <|.. PortalAvailabilityControl
-
-@enduml
+@endum
